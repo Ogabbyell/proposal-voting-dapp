@@ -1,7 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Counters.sol";
+
 contract ProposalContract {
+
+    using Counters for Counters.Counter;
+    Counters.Counter private _counter;
 
     struct Proposal {
         string title: //Title of the proposal
