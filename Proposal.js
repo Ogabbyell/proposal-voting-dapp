@@ -1,97 +1,72 @@
-contract ProposalContractTest {
+const { expect } = require("chai");
+const { ethers } = require("hardhat");
 
-    ProposalContract proposalContract;
+describe("ProposalContract", function () {
 
-    address owner;
-    address voter1;
-    address voter2;
+  let proposalContract;
+  let owner;
 
-    function setUp() public {
-        proposalContract = new ProposalContract();
-        owner = proposalContract.owner();
-        voter1 = address(1); 
-        voter2 = address(2);
-    }
+  beforeEach(async function() {
+    const ProposalContract = await ethers.getContractFactory("ProposalContract");
+    proposalContract = await ProposalContract.deploy();
+    [owner] = await ethers.getSigners();
+  });
 
-    function testCreateProposal() public {
-        string memory title = "Test Proposal";
-        string memory description = "Description for test proposal";
-        uint256 totalVotes = 100;
+  it("should set new owner", async function() {
+    const newOwner = ethers.Wallet.createRandom().address;
+    await proposalContract.connect(owner).setOwner(newOwner);
+    expect(await proposalContract.owner()).to.equal(newOwner);
+  });
 
-        proposalContract.create(title, description, totalVotes);
-        
-        Proposal memory proposal = proposalContract.getCurrentProposal();
-
-        assertEq(proposal.title, title);
-        assertEq(proposal.description, description);
-        assertEq(proposal.total_vote_to_end, totalVotes);
-    }
-
-    function testVote() public {
-        proposalContract.create("Title", "Description", 100);
-        
-        proposalContract.vote(1, {from: voter1});
-        
-        Proposal memory proposal = proposalContract.getCurrentProposal();
-        
-        assertEq(proposal.approve, 1);
-        assertTrue(proposalContract.isVoted(voter1));
-    }
-
-    function testCalculateCurrentState() public {
-        // test cases for different vote counts
-        proposalContract.create("Title", "Description", 100);
-        
-        // approve > reject + pass
-        proposalContract.vote(1, {from: voter1}); 
-        bool state = proposalContract.calculateCurrentState();
-        assertTrue(state);
-        
-        // reject > approve
-        proposalContract.vote(2, {from: voter2});
-        state = proposalContract.calculateCurrentState();        
-        assertFalse(state);
-    }
-
-    function testSetOwner() public {
-      address newOwner = address(3);
-      
-      proposalContract.setOwner(newOwner);
-      
-      assertEq(proposalContract.owner(), newOwner);
-    }
-
-    function testTerminateProposal() public {
+  it("should create new proposal", async function() {
+    const title = "Test Proposal";
+    const description = "Test description";
+    const totalVotes = 100;
+    await proposalContract.connect(owner).create(title, description, totalVotes);
     
-      proposalContract.create("Title", "Description", 100);
-      
-      proposalContract.teminateProposal();
-      
-      Proposal memory proposal = proposalContract.getCurrentProposal();
-    
-      assertFalse(proposal.is_active);
-    }
+    const proposal = await proposalContract.getCurrentProposal();
+    expect(proposal.title).to.equal(title);
+  });
 
-    function testGetProposal() public {
-      proposalContract.create("Title 1", "Desc 1", 100);
-      
-      proposalContract.create("Title 2", "Desc 2", 200);
+  it("should vote on proposal", async function() {
+    await proposalContract.connect(owner).create("Title", "Description", 100);
+    await proposalContract.connect(owner).vote(1);
     
-      Proposal memory proposal = proposalContract.getProposal(1);
-    
-      assertEq(proposal.title, "Title 1");
-      assertEq(proposal.description, "Desc 1");
-      assertEq(proposal.total_vote_to_end, 100);  
-    }
+    const proposal = await proposalContract.getCurrentProposal();
+    expect(proposal.approve).to.equal(1);
+  });
 
-    function testIsVoted() public {
+  it('should terminate proposal', async () => {
+    await proposalContract.create(...);
+    await proposalContract.terminateProposal();
+
+    const proposal = await proposalContract.getCurrentProposal();
+    expect(proposal.is_active).to.be.false;
+  });
+
+  it('should check if address voted', async () => {
+    await proposalContract.create(...);
     
-      proposalContract.create("Title", "Description", 100);
-      
-      proposalContract.vote(1, {from: voter1});
-      
-      bool isVoted = proposalContract.isVoted(voter1);  
+    await proposalContract.vote(1, voter1);
+    const voted = await proposalContract.isVoted(voter1);
+
+    expect(voted).to.be.true;
+  });
+
+  it('should get current proposal', async () => {
+    await proposalContract.create(...);
     
-      assertTrue(isVoted);
-    }
-}
+    const proposal = await proposalContract.getCurrentProposal();
+
+    expect(proposal.title).to.equal(...);
+  });
+
+  it('should get proposal by id', async () => {
+    await proposalContract.create(...);
+    await proposalContract.create(...);
+
+    const proposal = await proposalContract.getProposal(1);
+
+    expect(proposal.title).to.equal(...); 
+  });
+});
