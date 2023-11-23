@@ -1,6 +1,6 @@
 # proposal-voting-dapp
 ## Proposal Contract
-This is a solidity smart contract that allows creating governance proposals and voting on them. This contract is deployed on the Sepolia testnet. The contract address is 0xc0a810e636d2732de59204faf92ccb808f5c2064 and can be found on the sepolia etherscan by clicking [Here](https://sepolia.etherscan.io/address/0xc0a810e636d2732de59204faf92ccb808f5c2064)
+This is a solidity smart contract that allows creating governance proposals and voting on them. This contract is deployed on the Sepolia testnet. The contract address is 0x9a092a745f0f38b7a66927bd81caf38419104f31 and can be found on the sepolia etherscan by clicking [Here](https://sepolia.etherscan.io/address/0x9a092a745f0f38b7a66927bd81caf38419104f31)
 ## Contract Details
 The owner can create new proposals by calling the create() function.
  A proposal has a title, description, and total_vote_to_end which specifies the number of total votes required to end the voting.
