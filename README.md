@@ -18,5 +18,5 @@ Calculating proposal state,
 Checking previous votes.
 
 ## Future Improvements
-Access control roles beyond a single owner.
- Use of Upgradeable contract pattern.
+- Access control roles beyond a single owner.
+- Use of Upgradeable contract pattern.
