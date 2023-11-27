@@ -1,14 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
-import "@openzeppelin/contracts/utils/Counters.sol";
-
 contract ProposalContract {
 
-    address owner;
+    address owner; // Owner
 
-    using Counters for Counters.Counter;
-    Counters.Counter private _counter;
+    uint256 private counter;
 
     struct Proposal {
         string title; //Title of the proposal
@@ -35,7 +32,7 @@ contract ProposalContract {
     }
 
     modifier active() {
-        require(proposal_history[_counter.current()].is_active == true, "The proposal is not active");
+        require(proposal_history[counter].is_active == true, "The proposal is not active");
         _;
     }
 
@@ -49,12 +46,12 @@ contract ProposalContract {
     }
 
     function create(string calldata _title, string calldata _description, uint256 _total_vote_to_end) external onlyOwner {
-        _counter.increment();
-        proposal_history[_counter.current()] = Proposal(_title, _description, 0, 0, 0, _total_vote_to_end, false, true);
+        counter += 1;
+        proposal_history[counter] = Proposal(_title, _description, 0, 0, 0, _total_vote_to_end, false, true);
     }
 
     function vote(uint8 choice) external active newVoter(msg.sender) {
-        Proposal storage proposal = proposal_history[_counter.current()];
+        Proposal storage proposal = proposal_history[counter];
         uint256 total_vote = proposal.approve + proposal.reject + proposal.pass;
 
         voted_addresses.push(msg.sender);
@@ -77,7 +74,7 @@ contract ProposalContract {
     }
 
     function calculateCurrentState() private view returns(bool) {
-        Proposal storage proposal = proposal_history[_counter.current()];
+        Proposal storage proposal = proposal_history[counter];
     
         uint256 approve = proposal.approve;
         uint256 reject = proposal.reject;
@@ -97,7 +94,7 @@ contract ProposalContract {
     }
 
     function teminateProposal() external onlyOwner active {
-        proposal_history[_counter.current()].is_active = false;
+        proposal_history[counter].is_active = false;
     }
 
     function isVoted(address _address) public view returns (bool) {
@@ -110,7 +107,7 @@ contract ProposalContract {
     }
 
     function getCurrentProposal() external view returns(Proposal memory) {
-        return proposal_history[_counter.current()];
+        return proposal_history[counter];
     }
 
     function getProposal(uint256 number) external view returns(Proposal memory) {
