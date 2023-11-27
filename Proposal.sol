@@ -32,7 +32,7 @@ contract ProposalContract {
     }
 
     modifier active() {
-        require(proposal_history[counter].is_active == true, "The proposal is not active");
+        require(proposal_history[counter].is_active == true, "The proposal is active");
         _;
     }
 
